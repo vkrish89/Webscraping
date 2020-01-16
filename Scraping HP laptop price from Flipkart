@@ -1,0 +1,40 @@
+#Webscraping
+#Mandatory libraries to be imported
+
+from bs4 import BeautifulSoup as soup
+import bs4
+from urllib.request import urlopen as uReq
+
+myurl = 'https://www.flipkart.com/laptops/hp~brand/pr?sid=6bo,b5g&otracker=clp_metro_expandable_1_5.metroExpandable.METRO_EXPANDABLE_HP_laptops-store_ZCQFAP2R5I_wp4&fm=neo%2Fmerchandising&iid=M_8feb707d-bbda-4cb8-8a7f-8db33cb0176a_5.ZCQFAP2R5I&ppt=clp&ppn=laptops-store&ssid=9xwjejqzb40000001579068954327'
+
+#Grab the URL or connection to the webpage
+uclient = uReq(myurl)
+
+#offloads the content into variable
+page_html = uclient.read()
+
+#close the connection
+uclient.close()
+
+#page HTML parsing
+page_soup = soup(page_html, "html.parser")
+
+#grabs each product below statement can be grabbed by refering page source
+containers = page_soup.find_all("div", {"class" : "_3O0U0u"})
+print(len(containers))
+
+file_name = "Products.csv"
+
+f = open(file_name, "w", encoding = "utf-8")
+
+headers = "Brand, Price \n"
+f.write(headers)
+
+for container in containers:
+    brand = container.div.img['alt']
+    price = container.find("div", {"class": "_1vC4OE _2rQ-NK"}).text
+    print("Brand : " + brand)
+    print("Price : " + price)
+    f.write(brand + ',' + price.replace(",", ".") + "\n")
+
+f.close()
